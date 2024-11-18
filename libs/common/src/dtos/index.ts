@@ -1,2 +1,2 @@
-export * from './sec-filing-pull.dto';
+export * from './llm-query.dto';
 export * from './filing.dto';

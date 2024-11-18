@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { FilingsController } from '@/api/src/filings/fiings.controller';
-import { FilingsService } from '@/api/src/filings/filings.service';
+import { LlmController } from '@/api/src/llm/llm.controller';
+import { LlmService } from '@/api/src/llm/llm.service';
 import { DatabaseModule } from '@app/common/database/database.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
@@ -13,7 +13,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.RMQ,
         options: {
           urls: [process.env.RABBITMQ_URL], // RabbitMQ URL
-          queue: 'filings_queue', // The queue to communicate with
+          queue: 'embeddings_queue', // The queue to communicate with
           queueOptions: {
             durable: false,
           },
@@ -21,7 +21,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       },
     ]),
   ],
-  controllers: [FilingsController],
-  providers: [FilingsService],
+  controllers: [LlmController],
+  providers: [LlmService],
 })
-export class FilingsModule {}
+export class LlmModule {}

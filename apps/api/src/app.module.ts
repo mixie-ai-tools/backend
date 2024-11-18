@@ -1,9 +1,9 @@
 // app.module.ts
 import { Module } from '@nestjs/common';
-import { FilingsModule } from './filings';
+import { LlmModule } from './llm';
 
 @Module({
-  imports: [FilingsModule],
+  imports: [LlmModule],
   providers: [],
 })
 export class AppModule {}

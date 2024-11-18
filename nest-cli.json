@@ -26,24 +26,6 @@
         "tsConfigPath": "apps/api/tsconfig.app.json"
       }
     },
-    "sec": {
-      "type": "application",
-      "root": "apps/sec",
-      "entryFile": "main",
-      "sourceRoot": "apps/sec/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/sec/tsconfig.app.json"
-      }
-    },
-    "fetch": {
-      "type": "application",
-      "root": "apps/fetch",
-      "entryFile": "main",
-      "sourceRoot": "apps/fetch/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/fetch/tsconfig.app.json"
-      }
-    },
     "llm": {
       "type": "application",
       "root": "apps/llm",
@@ -51,6 +33,15 @@
       "sourceRoot": "apps/llm/src",
       "compilerOptions": {
         "tsConfigPath": "apps/llm/tsconfig.app.json"
+      }
+    },
+    "embeddings": {
+      "type": "application",
+      "root": "apps/embeddings",
+      "entryFile": "main",
+      "sourceRoot": "apps/embeddings/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/embeddings/tsconfig.app.json"
       }
     }
   },

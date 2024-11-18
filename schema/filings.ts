@@ -7,7 +7,7 @@ import {
   jsonb,
   timestamp,
 } from 'drizzle-orm/pg-core';
-import { FilingUrl } from '@/api/src/types/filings';
+import { FilingUrl } from '@app/common/types/filings';
 
 export const filingsTable = pgTable('filings', {
   id: serial('id').primaryKey(), // Auto-incrementing primary key
