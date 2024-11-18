@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS "filings" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"ticker" varchar(10) NOT NULL,
+	"form_type" varchar(20) NOT NULL,
+	"accession_no" varchar(20) NOT NULL,
+	"cik" varchar(20) NOT NULL,
+	"company_name_long" text NOT NULL,
+	"company_name" text NOT NULL,
+	"description" text,
+	"link_to_filing_details" text,
+	"link_to_txt" text,
+	"link_to_html" text,
+	"link_to_xbrl" text,
+	"filed_at" date NOT NULL,
+	"period_of_report" date,
+	"document_format_files" jsonb,
+	"entities" jsonb,
+	"series_and_classes_contracts_information" jsonb,
+	"data_files" jsonb
+);

@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mixietape-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mixietape
+    ports:
+      - '5432:5432'
+    volumes:
+      - ~/docker/postgres/mixietape-postgres:/var/lib/postgresql/data # Mount a persistent volume for data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: mixietape-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - '5672:5672' # Port for RabbitMQ connections
+      - '15672:15672' # Port for RabbitMQ management UI
+
+
+  # jumpbox:
+  #   container_name: jumpbox
+  #   build:
+  #     context: .
+  #     dockerfile: docker/Dockerfile.jumpbox
+  #   volumes:
+  #     - ./src:/mixietape
+  #   working_dir: /mixietape
+  #   stdin_open: true
+  #   tty: true
