@@ -8,7 +8,7 @@ export class EmbeddingsController {
   constructor(private readonly embeddingsService: EmbeddingsService) {}
 
   @UsePipes(new ValidationPipe())
-  @EventPattern('sec_filings_pull')
+  @EventPattern('embeddings.process_query')
   async SecFilingsFull(@Payload() llmQuery: LlmQueryDto) {
     await this.embeddingsService.createEmbeddings(llmQuery);
   }

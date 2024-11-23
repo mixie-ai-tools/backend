@@ -7,7 +7,7 @@ export class EmbeddingsService {
     // todo: create embeddings
     // doto: call retrieveVecorData
     // finally send this to the LLM for processing
-    Logger.log(llmQuery.query);
+    Logger.log(`testing ${llmQuery.query}`);
   }
 
   // todo: retrive vector data from postgres
