@@ -17,4 +17,8 @@ export class LlmController {
       return { error: 'Failed to reach llm', details: error.message };
     }
   }
+  @Get('/hello')
+  async hello() {
+    return 'hello world';
+  }
 }

@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { LlmQuerylDto } from '@app/common/dtos';
+import { LlmQueryDto } from '@app/common/dtos';
 
 @Injectable()
 export class LlmService {
@@ -13,7 +13,7 @@ export class LlmService {
     this.client.connect();
   }
 
-  async queryToEmbedding(llmQuery: LlmQuerylDto) {
+  async queryToEmbedding(llmQuery: LlmQueryDto) {
     await this.client.emit('embeddings.process_query', llmQuery);
     return {
       message: 'Request Queued',

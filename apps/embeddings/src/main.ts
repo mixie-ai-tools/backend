@@ -1,8 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { EmbeddingsModule } from './embeddings.module';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import * as dotenv from 'dotenv';
 
 async function bootstrap() {
+  dotenv.config();
+
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     EmbeddingsModule,
     {

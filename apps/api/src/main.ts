@@ -7,10 +7,8 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  // Set up RabbitMQ client options if using microservices
-
   await app.startAllMicroservices(); // Start the microservice
   app.enableCors({});
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();

@@ -11,7 +11,7 @@
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "concurrently \"nest start --watch\" \"nest start fetch --watch\" \"nest start sec --watch\"",
+    "start:dev": "concurrently \"nest start --watch\" \"nest start embeddings --watch\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/api/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -22,6 +22,7 @@
     "test:e2e": "jest --config ./apps/api/test/jest-e2e.json"
   },
   "dependencies": {
+    "@llm-tools/embedjs-interfaces": "^0.1.18",
     "@nestjs/class-validator": "^0.13.4",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
