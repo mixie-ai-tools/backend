@@ -1,11 +1,20 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { LlmService } from '@/api/src/llm/llm.service';
 import { LlmQueryDto } from '@app/common/dtos';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentService } from './document.service';
 
 @Controller('llm')
 export class LlmController {
-  constructor(private readonly llmService: LlmService) {}
+  constructor(
+    private readonly llmService: LlmService,
+    private readonly documentService: DocumentService,
+  ) {}
 
   @Get()
   async getLlm(
@@ -19,6 +28,11 @@ export class LlmController {
   }
   @Get('/hello')
   async hello() {
-    return 'hello world';
+    return await this.documentService.search('who is dr dre', 6);
+  }
+
+  @Get('process')
+  async processDocs() {
+    return await this.documentService.processDocuments();
   }
 }

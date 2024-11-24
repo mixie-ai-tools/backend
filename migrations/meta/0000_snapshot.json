@@ -1,5 +1,5 @@
 {
-  "id": "3039d747-b3e0-44de-b407-96cb69d31d23",
+  "id": "e49c4ec5-0da6-4747-92b8-4c6b34b97185",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,39 +10,27 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true
         },
         "vector": {
           "name": "vector",
-          "type": "double precision[]",
+          "type": "vector(1536)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "metadata": {
           "name": "metadata",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
-        },
-        "page_content": {
-          "name": "page_content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "unique_loader_id": {
-          "name": "unique_loader_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "source": {
-          "name": "source",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},

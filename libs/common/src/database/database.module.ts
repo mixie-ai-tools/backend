@@ -8,7 +8,7 @@ import * as postgres from 'postgres';
   imports: [ConfigModule],
   providers: [
     {
-      provide: 'POSTGRES_SERVICE',
+      provide: 'POSTGRES_DB',
       useFactory: (configService: ConfigService) => {
         // Initialize Postgres.js client
         const client = postgres({
@@ -27,6 +27,20 @@ import * as postgres from 'postgres';
       inject: [ConfigService],
     },
   ],
-  exports: ['POSTGRES_SERVICE'],
+  exports: ['POSTGRES_DB'],
 })
 export class DatabaseModule {}
+
+// import {
+//   Injectable,
+//   Inject,
+//   OnModuleInit,
+//   InternalServerErrorException,
+// } from '@nestjs/common';
+// import { ConfigService } from '@nestjs/config';
+// import { OpenAIEmbeddings } from '@langchain/openai';
+// import { TextLoader } from 'langchain/document_loaders/fs/text';
+// import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
+// import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+// import { Document } from 'langchain/document';
+// import { SqlDatabase } from 'langchain/sql_db';

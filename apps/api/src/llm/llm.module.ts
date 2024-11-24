@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LlmController } from '@/api/src/llm/llm.controller';
 import { LlmService } from '@/api/src/llm/llm.service';
+import { DocumentService } from './document.service';
 import { DatabaseModule } from '@app/common/database/database.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
@@ -9,7 +10,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     DatabaseModule,
     ClientsModule.register([
       {
-        name: 'RABBIT_MQ_SERVICE',
+        name: 'RABBITMQ',
         transport: Transport.RMQ,
         options: {
           urls: [process.env.RABBITMQ_URL], // RabbitMQ URL
@@ -22,6 +23,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [LlmController],
-  providers: [LlmService],
+  providers: [LlmService, DocumentService],
 })
 export class LlmModule {}

@@ -1,20 +1,20 @@
 import {
   pgTable,
-  serial,
+  // serial,
   jsonb,
   text,
-  varchar,
-  doublePrecision,
+  // varchar,
+  // doublePrecision,
+  vector,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 // Define the table schema
 export const vectors = pgTable('vectors', {
-  id: serial('id').primaryKey(),
-  vector: doublePrecision('vector').array(),
-  metadata: jsonb('metadata'),
-  pageContent: text('page_content'),
-  uniqueLoaderId: varchar('unique_loader_id', { length: 255 }),
-  source: text('source'),
+  id: uuid('id').primaryKey(), // Primary key column for unique IDs
+  vector: vector('vector', { dimensions: 1536 }).notNull(), // Vector column, specify dimensions (e.g., 1536 for OpenAI embeddings)
+  content: text('content').notNull(), // Text content column
+  metadata: jsonb('metadata').notNull(), // JSONB column for metadata
 });
 
 // Infer the TypeScript types for Select and Insert

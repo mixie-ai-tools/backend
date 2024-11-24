@@ -7,8 +7,8 @@ import { LlmQueryDto } from '@app/common/dtos';
 @Injectable()
 export class LlmService {
   constructor(
-    @Inject('POSTGRES_SERVICE') private readonly db: PostgresJsDatabase,
-    @Inject('RABBIT_MQ_SERVICE') private readonly client: ClientProxy,
+    @Inject('POSTGRES_DB') private readonly db: PostgresJsDatabase,
+    @Inject('RABBITMQ') private readonly client: ClientProxy,
   ) {
     this.client.connect();
   }
@@ -20,4 +20,6 @@ export class LlmService {
       data: llmQuery,
     };
   }
+
+  //
 }
