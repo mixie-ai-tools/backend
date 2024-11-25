@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { LlmService } from '@/api/src/llm/llm.service';
 import { LlmQueryDto } from '@app/common/dtos';
 import { ValidationPipe } from '@nestjs/common';
@@ -28,7 +23,7 @@ export class LlmController {
   }
   @Get('/hello')
   async hello() {
-    return await this.documentService.search('who is dr dre', 6);
+    return await this.documentService.generateResponse('who is dr dre');
   }
 
   @Get('process')

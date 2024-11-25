@@ -15,6 +15,8 @@ import {
 import { PoolConfig } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 
+import { OpenAI } from '@langchain/openai';
+
 @Injectable()
 export class DocumentService implements OnModuleInit {
   private embeddings: OpenAIEmbeddings;
@@ -110,6 +112,37 @@ export class DocumentService implements OnModuleInit {
     } catch (error) {
       throw new InternalServerErrorException(
         `Failed to delete documents: ${error.message}`,
+      );
+    }
+  }
+
+  async generateResponse(query: string) {
+    try {
+      // Retrieve relevant documents
+      const docs = await this.vectorStore.similaritySearch(query, 3);
+
+      // Concatenate document contents
+      const context = docs.map((doc) => doc.pageContent).join('\n');
+
+      // Initialize the LLM
+      const llm = new OpenAI({
+        openAIApiKey: this.configService.get<string>('OPENAI_API_KEY'),
+      });
+
+      // Create the prompt
+      const prompt = `
+        Question: ${query}
+        Context: ${context}
+        Answer:
+      `;
+
+      // Generate the response
+      const response = await llm.invoke(prompt);
+
+      return response;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Response generation failed: ${error.message}`,
       );
     }
   }
