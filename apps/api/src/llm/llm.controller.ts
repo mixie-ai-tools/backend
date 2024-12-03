@@ -26,7 +26,7 @@ export class LlmController {
 
   @Get('/search')
   async search() {
-    return await this.lmStudioService.search('who is dr dre', 3);
+    return await this.lmStudioService.similaritySearch('who is dr dre', 3);
   }
 
   @Get('process')

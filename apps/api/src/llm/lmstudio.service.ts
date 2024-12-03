@@ -11,12 +11,17 @@ import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { Document } from 'langchain/document';
 import { TextLoader } from 'langchain/document_loaders/fs/text';
 import { v7 as uuidv7 } from 'uuid';
+import { contents } from 'cheerio/dist/commonjs/api/traversing';
+
 
 @Injectable()
 export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy {
   private lmStudioClient: LMStudioClient;
   private embeddingModel: any; // Replace `any` with the exact type from the SDK, if available.
-  private readonly modelName = 'text-embedding-nomic-embed-text-v1.5'; // Example model name
+  private llmModel : any;
+  private readonly embeddingModelName = 'text-embedding-nomic-embed-text-v1.5'; // Example model name
+  private readonly llmModelName = 'hugging-quants/Llama-3.2-1B-Instruct-Q8_0-GGUF';//'Qwen/Qwen2.5-Coder-32B-Instruct-GGUF'
+
 
   constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore) {}
 
@@ -24,11 +29,19 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
     this.lmStudioClient = new LMStudioClient();
 
     try {
-      this.embeddingModel = await this.lmStudioClient.embedding.get(this.modelName);
+      this.embeddingModel = await this.lmStudioClient.embedding.get(this.embeddingModelName);
     } catch (e) {
-      this.embeddingModel = await this.lmStudioClient.embedding.load(this.modelName);
+      this.embeddingModel = await this.lmStudioClient.embedding.load(this.embeddingModelName);
+    }
+
+    try {
+      this.llmModel = await this.lmStudioClient.llm.get(this.llmModelName);
+    }catch(e){
+      this.llmModel = await this.lmStudioClient.llm.load(this.llmModelName);
     }
   }
+
+
 
   async embedText(text: string): Promise<number[]> {
     if (!this.embeddingModel) {
@@ -60,16 +73,6 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
     }
   }
 
-  async search(query: string, topK: number, filter?: Record<string, any>): Promise<Document[]> {
-    try {
-      // Perform a similarity search with optional filtering
-      const results = await this.vectorStore.similaritySearch(query, topK, filter);
-      return results;
-    } catch (error) {
-      throw new InternalServerErrorException(`Search failed: ${error.message}`);
-    }
-  }
-
   async deleteDocuments(ids: string[]): Promise<void> {
     try {
       // Delete documents from the vector store by IDs
@@ -81,9 +84,38 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
     }
   }
 
+  async similaritySearch(query: string, topK: number, filter?: Record<string, any>) {
+    try {
+      // Retrieve relevant documents
+      const docs = await this.vectorStore.similaritySearch( query, topK, filter);
+
+      // Concatenate document contents
+      const context = docs.map((doc) => doc.pageContent).join('\n');
+
+      // Create the prompt
+      const prompt = `
+        Question: ${query}
+        Context: ${context}
+        Answer:
+      `;
+
+      console.log(this.llmModel.model);
+      // console.log(prompt)
+    return await this.llmModel.respond([
+      {role: 'user', content: prompt}
+    ])
+   
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Response generation failed: ${error.message}`,
+      );
+    }
+  }
+
   async onModuleDestroy(): Promise<void> {
     if (this.embeddingModel) {
-      await this.lmStudioClient.embedding.unload(this.modelName);
+      await this.lmStudioClient.embedding.unload(this.embeddingModelName);
+      await this.lmStudioClient.llm.unload(this.llmModelName);
     }
   }
 }
