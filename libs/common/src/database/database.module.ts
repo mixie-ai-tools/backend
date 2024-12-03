@@ -3,52 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigModule } from '@app/common/config';
 import { drizzle } from 'drizzle-orm/postgres-js'; // Correct import path for Postgres.js
 import * as postgres from 'postgres';
-import { EmbeddingSpecificModel, LMStudioClient } from '@lmstudio/sdk';
+import { LMStudioClient } from '@lmstudio/sdk';
 import {
   PGVectorStore,
   DistanceStrategy,
 } from '@langchain/community/vectorstores/pgvector';
 import { PoolConfig } from 'pg';
-
-
-class Foo {
-
-  private lmStudioClient: LMStudioClient;
-  private embeddingModel: EmbeddingSpecificModel;
-
-  constructor(client: LMStudioClient) {
-    this.lmStudioClient = client
-  }
-
-  async init() {
-
-    const modelName = 'text-embedding-nomic-embed-text-v1.5';
-
-    try {
-      this.embeddingModel = await this.lmStudioClient.embedding.get(modelName);
-    } catch (e) {
-      this.embeddingModel = await this.lmStudioClient.embedding.load(modelName);
-    }
-  }
-
-
-  async embedDocuments(documents: string[]): Promise<number[][]> {
-    const results: number[][] = [];
-
-    for (const document of documents) {
-      // Simulate some processing that returns an array of numbers
-      const embeddedDocument = await this.embedQuery(document);
-      results.push(embeddedDocument);
-    }
-    return results;
-  }
-
-  async embedQuery(document: string): Promise<number[]> {
-    const result = await this.embeddingModel.embedString(document);
-
-    return result.embedding
-  };
-}
+import { EmbeddingModel } from './classes/embedding-model';
 
 @Module({
   imports: [ConfigModule],
@@ -95,21 +56,17 @@ class Foo {
 
         const lmStudioClient = new LMStudioClient();
 
+        const embeddingService = new EmbeddingModel(lmStudioClient);
+        await embeddingService.init();
 
-        const foo = new Foo(lmStudioClient);
-        foo.init()
         // Initialize PGVectorStore
-        const vectorStore = await PGVectorStore.initialize(
-          foo,
-          config,
-        );
+        const vectorStore = await PGVectorStore.initialize(embeddingService, config);
 
-        return vectorStore
+        return vectorStore;
       },
       inject: [ConfigService],
     },
   ],
   exports: ['POSTGRES_DB', 'POSTGRES_VECTOR_DB'],
 })
-export class DatabaseModule { }
-
+export class DatabaseModule {}

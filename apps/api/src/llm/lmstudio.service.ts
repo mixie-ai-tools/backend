@@ -1,6 +1,9 @@
 import {
-  Inject, Injectable, OnModuleInit, OnModuleDestroy,
-  InternalServerErrorException
+  Inject,
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { LMStudioClient } from '@lmstudio/sdk';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
@@ -15,9 +18,8 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
   private embeddingModel: any; // Replace `any` with the exact type from the SDK, if available.
   private readonly modelName = 'text-embedding-nomic-embed-text-v1.5'; // Example model name
 
-  constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore,) {
+  constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore) {}
 
-  }
   async onModuleInit(): Promise<void> {
     this.lmStudioClient = new LMStudioClient();
 
@@ -37,32 +39,20 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
     return emb.embedding;
   }
 
-  async processDocuments() {
+  async processDocuments(): Promise<void> {
     try {
       // Load text documents from a directory
       const loader = new DirectoryLoader(
         '/home/edgar/Code/backend/_foo',
-        {
-          '.txt': (path) => new TextLoader(path),
-        },
+        { '.txt': (path) => new TextLoader(path) },
       );
       const docs: Document[] = await loader.load();
 
       // Generate unique IDs for the documents
       const ids = docs.map(() => uuidv7());
-      console.log(ids, docs)
 
       // Add documents to the PGVectorStore
-      const d = await this.vectorStore.addDocuments(docs, { ids });
-      return d;
-
-      // // Example query
-      // const query = 'What is the capital of France?';
-
-      // // Perform a similarity search
-      // const results = await this.vectorStore.similaritySearch(query, 3);
-
-      // return results;
+      await this.vectorStore.addDocuments(docs, { ids });
     } catch (error) {
       throw new InternalServerErrorException(
         `Document processing failed: ${error.message}`,
@@ -70,22 +60,17 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
     }
   }
 
-
-  async search(query: string, topK: number, filter?: Record<string, any>) {
+  async search(query: string, topK: number, filter?: Record<string, any>): Promise<Document[]> {
     try {
       // Perform a similarity search with optional filtering
-      const results = await this.vectorStore.similaritySearch(
-        query,
-        topK,
-        filter,
-      );
+      const results = await this.vectorStore.similaritySearch(query, topK, filter);
       return results;
     } catch (error) {
       throw new InternalServerErrorException(`Search failed: ${error.message}`);
     }
   }
 
-  async deleteDocuments(ids: string[]) {
+  async deleteDocuments(ids: string[]): Promise<void> {
     try {
       // Delete documents from the vector store by IDs
       await this.vectorStore.delete({ ids });
