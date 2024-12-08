@@ -75,7 +75,6 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
 
   async deleteDocuments(ids: string[]): Promise<void> {
     try {
-      // Delete documents from the vector store by IDs
       await this.vectorStore.delete({ ids });
     } catch (error) {
       throw new InternalServerErrorException(

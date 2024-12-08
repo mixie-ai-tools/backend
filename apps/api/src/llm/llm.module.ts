@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { LlmController } from '@/api/src/llm/llm.controller';
 import { LlmService } from '@/api/src/llm/llm.service';
-// import { DocumentService } from './document.service';
 import { DatabaseModule } from '@app/common/database/database.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LmStudioEmbeddingsService } from '@/api/src/llm/lmstudio.service';
-
+import { ShopifyService } from './shopify.service';
 
 @Module({
   imports: [
@@ -25,6 +24,6 @@ import { LmStudioEmbeddingsService } from '@/api/src/llm/lmstudio.service';
     ]),
   ],
   controllers: [LlmController],
-  providers: [LlmService, LmStudioEmbeddingsService],// DocumentService,
+  providers: [LlmService, LmStudioEmbeddingsService, ShopifyService],// DocumentService,
 })
 export class LlmModule {}
