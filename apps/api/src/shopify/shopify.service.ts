@@ -14,6 +14,8 @@ export class ShopifyService {
 
   async fetchProducts(): Promise<any> {
 
+    console.log(process.env.SHOPIFY_SHOP_NAME)
+    console.log(process.env.SHOPIFY_ACCESS_TOKEN )
     try {
       const url = `https://${this.shopName}.myshopify.com/api/2024-01/graphql.json`;
       const headers = {
@@ -22,7 +24,7 @@ export class ShopifyService {
       };
       const query = `
         query {
-          products(first: 250) {
+          products(first: 2) {
             edges {
               node {
                 id

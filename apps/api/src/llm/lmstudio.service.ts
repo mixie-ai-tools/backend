@@ -2,7 +2,6 @@ import {
   Inject,
   Injectable,
   OnModuleInit,
-  OnModuleDestroy,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { LMStudioClient } from '@lmstudio/sdk';
@@ -14,12 +13,12 @@ import { v7 as uuidv7 } from 'uuid';
 
 
 @Injectable()
-export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy {
+export class LmStudioEmbeddingsService implements OnModuleInit{
   private lmStudioClient: LMStudioClient;
   private embeddingModel: any; // Replace `any` with the exact type from the SDK, if available.
   private llmModel : any;
-  private readonly embeddingModelName = 'embed-model'; // text-embedding-nomic-embed-text-v1.5   Example model name
-  private readonly llmModelName = 'llm-model';// hugging-quants/Llama-3.2-1B-Instruct-Q8_0-GGUF  'Qwen/Qwen2.5-Coder-32B-Instruct-GGUF'
+  private readonly embeddingModelName = 'embed-model';
+  private readonly llmModelName = 'llm-model';
 
 
   constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore) {}
@@ -27,9 +26,7 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
   async onModuleInit(): Promise<void> {
     this.lmStudioClient = new LMStudioClient();
 
-    try {
-      // await this.lmStudioClient.embedding.unload(this.embeddingModelName);
-     
+    try {     
       this.embeddingModel = await this.lmStudioClient.embedding.get({
         identifier: this.embeddingModelName
       });
@@ -39,16 +36,12 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
       this.embeddingModel = await this.lmStudioClient.embedding.load('text-embedding-nomic-embed-text-v1.5',{
         identifier: this.embeddingModelName
       });
-   // 
     }
 
     try {
       this.llmModel = await this.lmStudioClient.llm.get(this.llmModelName);
     }catch(e){
       console.log('NO LLM AVAILABLE')
-    
-      console.log(e)
-      // this.llmModel = await this.lmStudioClient.llm.load(this.llmModelName, {identifier: 'llama'});
     }
   }
 
@@ -65,17 +58,13 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
 
   async processDocuments(): Promise<void> {
     try {
-      // Load text documents from a directory
       const loader = new DirectoryLoader(
         '/home/edgar/Code/backend/_foo',
         { '.txt': (path) => new TextLoader(path) },
       );
       const docs: Document[] = await loader.load();
 
-      // Generate unique IDs for the documents
       const ids = docs.map(() => uuidv7());
-
-      // Add documents to the PGVectorStore
       await this.vectorStore.addDocuments(docs, { ids });
     } catch (error) {
       throw new InternalServerErrorException(
@@ -97,21 +86,13 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
 
   async similaritySearch(query: string, topK: number, filter?: Record<string, any>) {
     try {
-      // Retrieve relevant documents
       const docs = await this.vectorStore.similaritySearch( query, topK, filter);
-
-      // Concatenate document contents
       const context = docs.map((doc) => doc.pageContent).join('\n');
-
-      // Create the prompt
       const prompt = `
         Question: ${query}
         Context: ${context}
         Answer:
       `;
-
-      console.log(this.llmModel.model);
-      // console.log(prompt)
     return await this.llmModel.respond([
       {role: 'user', content: prompt}
     ])
@@ -123,10 +104,4 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
     }
   }
 
-  async onModuleDestroy(): Promise<void> {
-    // if (this.embeddingModel) {
-       //await this.lmStudioClient.embedding.unload(this.embeddingModelName);
-      // await this.lmStudioClient.llm.unload(this.llmModelName);
-    // }
-  }
 }
