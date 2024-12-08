@@ -37,7 +37,7 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
     try {
       this.llmModel = await this.lmStudioClient.llm.get(this.llmModelName);
     }catch(e){
-      this.llmModel = await this.lmStudioClient.llm.load(this.llmModelName);
+      this.llmModel = await this.lmStudioClient.llm.load(this.llmModelName, {identifier: 'llama'});
     }
   }
 
@@ -113,9 +113,9 @@ export class LmStudioEmbeddingsService implements OnModuleInit, OnModuleDestroy 
   }
 
   async onModuleDestroy(): Promise<void> {
-    if (this.embeddingModel) {
+    // if (this.embeddingModel) {
       await this.lmStudioClient.embedding.unload(this.embeddingModelName);
       await this.lmStudioClient.llm.unload(this.llmModelName);
-    }
+    // }
   }
 }

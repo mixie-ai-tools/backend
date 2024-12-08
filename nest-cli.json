@@ -26,15 +26,6 @@
         "tsConfigPath": "apps/api/tsconfig.app.json"
       }
     },
-    "llm": {
-      "type": "application",
-      "root": "apps/llm",
-      "entryFile": "main",
-      "sourceRoot": "apps/llm/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/llm/tsconfig.app.json"
-      }
-    },
     "embeddings": {
       "type": "application",
       "root": "apps/embeddings",
