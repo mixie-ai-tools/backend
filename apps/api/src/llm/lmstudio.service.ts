@@ -56,22 +56,22 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
     return emb.embedding;
   }
 
-  async processDocuments(): Promise<void> {
-    try {
-      const loader = new DirectoryLoader(
-        '/home/edgar/Code/backend/_foo',
-        { '.txt': (path) => new TextLoader(path) },
-      );
-      const docs: Document[] = await loader.load();
+  // async processDocuments(): Promise<void> {
+  //   try {
+  //     const loader = new DirectoryLoader(
+  //       '/home/edgar/Code/backend/_foo',
+  //       { '.txt': (path) => new TextLoader(path) },
+  //     );
+  //     const docs: Document[] = await loader.load();
 
-      const ids = docs.map(() => uuidv7());
-      await this.vectorStore.addDocuments(docs, { ids });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Document processing failed: ${error.message}`,
-      );
-    }
-  }
+  //     const ids = docs.map(() => uuidv7());
+  //     await this.vectorStore.addDocuments(docs, { ids });
+  //   } catch (error) {
+  //     throw new InternalServerErrorException(
+  //       `Document processing failed: ${error.message}`,
+  //     );
+  //   }
+  // }
 
   async deleteDocuments(ids: string[]): Promise<void> {
     try {
@@ -102,5 +102,26 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
       );
     }
   }
+  async addShopifyProductsToVectorStore(productsData: any[]): Promise<void> {
+    try {
+      // Create documents from the products data
+      const docs: Document[] = productsData.map((product) => {
+        return new Document({
+          pageContent: product.node.description,
+          metadata: { title: product.node.title, id: product.node.id },
+        });
+      });
 
+      // Generate unique IDs for the documents
+      const ids = docs.map(() => uuidv7());
+
+      // Add documents to the PGVectorStore
+      await this.vectorStore.addDocuments(docs, { ids });
+
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to add Shopify products to vector store: ${error.message}`,
+      );
+    }
+  }
 }

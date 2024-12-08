@@ -19,13 +19,18 @@ export class LlmController {
   async search() {
     // return await this.lmStudioService.similaritySearch('who is dr dre', 3);
   }
+  
 
   @Get('process')
   async processDocs() {
     try {
       const products  = await this.shopifyService.fetchProducts();
+      // Extract the product data
+      const productsData = products.data.products.edges;
 
-      return await this.lmStudioService.processDocuments();
+      // Add products to vector store
+     return  await this.lmStudioService.addShopifyProductsToVectorStore(productsData);
+     /// return await this.lmStudioService.processDocuments();
     }catch(e){
       Logger.log(e)
     }

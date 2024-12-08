@@ -21,7 +21,7 @@ export class ShopifyService {
       };
       const query = `
         query {
-          products(first: 2) {
+          products(first: 250) {
             edges {
               node {
                 id
