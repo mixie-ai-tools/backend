@@ -9,6 +9,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices(); // Start the microservice
   app.enableCors({});
+  app.enableShutdownHooks();
   await app.listen(3001);
 }
 bootstrap();
