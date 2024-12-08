@@ -32,7 +32,6 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
       });
     } catch (e) {
       console.log('NO EMBEDDING MODEL AVAILABLE')
-      console.log(e)
       this.embeddingModel = await this.lmStudioClient.embedding.load('text-embedding-nomic-embed-text-v1.5',{
         identifier: this.embeddingModelName
       });
@@ -89,12 +88,28 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
       const context = docs.map((doc) => doc.pageContent).join('\n');
       const prompt = `
         Question: ${query}
-        Context: ${context}
+        Products and Context: ${context}
         Answer:
       `;
-    return await this.llmModel.respond([
-      {role: 'user', content: prompt}
-    ])
+
+
+  
+    const resp =await this.llmModel.respond([
+      { role: "system", content: {
+        type:'text',
+        text: "You are a personal shopper specializing in e-commerce with friendly disposition. Your job is to help customers find the right products and help them buy more"
+      } },
+      {role: 'user', content: {
+        type: 'text',
+        text:prompt
+      }}
+    ]);
+
+    console.log("============")
+    // console.log( {role: 'user', content: prompt})
+    console.log(resp);
+    console.log("============")
+    return resp;
    
     } catch (error) {
       throw new InternalServerErrorException(
