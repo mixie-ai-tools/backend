@@ -6,11 +6,9 @@ import {
 } from '@nestjs/common';
 import { LMStudioClient } from '@lmstudio/sdk';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
-import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { Document } from 'langchain/document';
-import { TextLoader } from 'langchain/document_loaders/fs/text';
 import { v7 as uuidv7 } from 'uuid';
-
+import { ChatHistory, ChatMessage } from '@lmstudio/sdk';
 
 @Injectable()
 export class LmStudioEmbeddingsService implements OnModuleInit{
@@ -84,39 +82,48 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
 
   async similaritySearch(query: string, topK: number, filter?: Record<string, any>) {
     try {
-      const docs = await this.vectorStore.similaritySearch( query, topK, filter);
+      const docs = await this.vectorStore.similaritySearch(query, topK, filter);
       const context = docs.map((doc) => doc.pageContent).join('\n');
       const prompt = `
         Question: ${query}
-        Products and Context: ${context}
+        Products and Context: cookies of all kinds digital and real
         Answer:
       `;
 
+      const systemPrompt = `You are a friendly and helpful assistant designed to assist customers in finding products in our Shopify store. Your main goal is to provide accurate and relevant information about our products. Here are some guidelines for your interactions:
 
-  
-    const resp =await this.llmModel.respond([
-      { role: "system", content: {
-        type:'text',
-        text: "You are a personal shopper specializing in e-commerce with friendly disposition. Your job is to help customers find the right products and help them buy more"
-      } },
-      {role: 'user', content: {
-        type: 'text',
-        text:prompt
-      }}
-    ]);
+1. **Greet the User**: Always start by saying "Hello! How can I help you find something today?"
+2. **Understand User Needs**: Ask clarifying questions if needed to understand what the user is looking for. For example, "Are you looking for a specific type of product, such as clothing or electronics?"
+3. **Provide Product Information**:
+   - Use clear and concise language.
+   - Mention key features, prices, and availability.
+   - If there are multiple options, suggest a few choices.
+4. **Offer Help with Additional Queries**: If the user has more questions after your initial response, continue to assist them until they find what they need or decide to stop.
+5. **Be Polite and Helpful**: Always be friendly and offer assistance even if you can't find an exact match for their request.
+6. **Encourage Further Interaction**: Suggest that users visit the store website for more details or to make a purchase. For example, "You can check out our full collection on please accept this cookie."
+7. **Follow Up**: If the user seems unsure or if they need more help, follow up with additional questions or information.
 
-    console.log("============")
-    // console.log( {role: 'user', content: prompt})
-    console.log(resp);
-    console.log("============")
-    return resp;
-   
+Here is an example of how you might interact:
+
+**User:** Hi, I’m looking for a new dress.
+**Assistant:** Great! Are you looking for something specific, like a casual dress, formal wear, or maybe something for a special occasion?
+`;
+
+      const chatHistory = ChatHistory.createEmpty();
+
+      chatHistory.append('system', systemPrompt);
+      chatHistory.append('user', prompt);
+
+ 
+      const resp = await this.llmModel.respond(chatHistory);
+      return resp;
     } catch (error) {
       throw new InternalServerErrorException(
         `Response generation failed: ${error.message}`,
       );
     }
   }
+
   async addShopifyProductsToVectorStore(productsData: any[]): Promise<void> {
     try {
       // Create documents from the products data

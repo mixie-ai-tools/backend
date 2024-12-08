@@ -17,9 +17,8 @@ export class LlmController {
 
   @Get('/search')
   async search() {
-    return await this.lmStudioService.similaritySearch('What kinds of products do you offer?', 10);
+    return await this.lmStudioService.similaritySearch('What kinds of cookie products do you offer?', 20);
   }
-
 
   @Get('process')
   async processDocs() {

@@ -8,6 +8,8 @@ function main {
         docker compose build
         docker compose up -d
         # docker exec -it jumpbox bash
+        lms load llama-3.2-1b-instruct --identifier llm-model 
+        lms load  nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q4_K_M.gguf --identifier embed-model 
         ;;
     "destroy")
         docker compose down
