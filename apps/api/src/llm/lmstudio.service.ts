@@ -53,23 +53,6 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
     return emb.embedding;
   }
 
-  // async processDocuments(): Promise<void> {
-  //   try {
-  //     const loader = new DirectoryLoader(
-  //       '/home/edgar/Code/backend/_foo',
-  //       { '.txt': (path) => new TextLoader(path) },
-  //     );
-  //     const docs: Document[] = await loader.load();
-
-  //     const ids = docs.map(() => uuidv7());
-  //     await this.vectorStore.addDocuments(docs, { ids });
-  //   } catch (error) {
-  //     throw new InternalServerErrorException(
-  //       `Document processing failed: ${error.message}`,
-  //     );
-  //   }
-  // }
-
   async deleteDocuments(ids: string[]): Promise<void> {
     try {
       await this.vectorStore.delete({ ids });
@@ -84,10 +67,10 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
     try {
       const docs = await this.vectorStore.similaritySearch(query, topK, filter);
       const context = docs.map((doc) => doc.pageContent).join('\n');
+     
       const prompt = `
         Question: ${query}
-        Products and Context: cookies of all kinds digital and real
-        Answer:
+        Products and Context: ${context}
       `;
 
       const systemPrompt = `You are a friendly and helpful assistant designed to assist customers in finding products in our Shopify store. Your main goal is to provide accurate and relevant information about our products. Here are some guidelines for your interactions:
@@ -103,10 +86,6 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
 6. **Encourage Further Interaction**: Suggest that users visit the store website for more details or to make a purchase. For example, "You can check out our full collection on please accept this cookie."
 7. **Follow Up**: If the user seems unsure or if they need more help, follow up with additional questions or information.
 
-Here is an example of how you might interact:
-
-**User:** Hi, I’m looking for a new dress.
-**Assistant:** Great! Are you looking for something specific, like a casual dress, formal wear, or maybe something for a special occasion?
 `;
 
       const chatHistory = ChatHistory.createEmpty();

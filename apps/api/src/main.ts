@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   await app.startAllMicroservices(); // Start the microservice
-  app.enableCors({});
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,POST,PATCH,DELETE'
+  });
   app.enableShutdownHooks();
   await app.listen(3001);
 }

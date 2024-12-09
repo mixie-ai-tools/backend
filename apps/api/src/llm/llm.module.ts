@@ -5,6 +5,7 @@ import { DatabaseModule } from '@app/common/database/database.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LmStudioEmbeddingsService } from '@/api/src/llm/lmstudio.service';
 import { ShopifyService } from './shopify.service';
+import { ChatsService } from './chats.service';
 
 @Module({
   imports: [
@@ -24,6 +25,6 @@ import { ShopifyService } from './shopify.service';
     ]),
   ],
   controllers: [LlmController],
-  providers: [LlmService, LmStudioEmbeddingsService, ShopifyService],// DocumentService,
+  providers: [LlmService, LmStudioEmbeddingsService, ShopifyService, ChatsService],// DocumentService,
 })
 export class LlmModule {}

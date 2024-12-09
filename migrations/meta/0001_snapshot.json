@@ -1,6 +1,6 @@
 {
-  "id": "57795ac2-1748-43f7-b80a-65a43de6db44",
-  "prevId": "e49c4ec5-0da6-4747-92b8-4c6b34b97185",
+  "id": "7c9021bf-200a-445a-bd0e-612f38393c6a",
+  "prevId": "57795ac2-1748-43f7-b80a-65a43de6db44",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -29,34 +29,6 @@
         "metadata": {
           "name": "metadata",
           "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.documents": {
-      "name": "documents",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "embedding": {
-          "name": "embedding",
-          "type": "vector(1536)",
           "primaryKey": false,
           "notNull": true
         }
