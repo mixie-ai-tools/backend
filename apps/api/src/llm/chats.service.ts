@@ -19,8 +19,8 @@ export class ChatsService {
 
   async getAllChatById(conversationId: string) {
     const chat = await this.db.select().from(chats)
-    .where(sql`${chats.conversationId} = ${conversationId}`)
-    .execute();
+      .where(sql`${chats.conversationId} = ${conversationId}`)
+      .execute();
     return chat;
   }
 
@@ -40,13 +40,12 @@ export class ChatsService {
   }
 
   // Update an existing chat by conversationId
-  async updateChatById(updateChatDto: UpdateChatDto): Promise<any> {
-    const { conversationId, chatBlob } = updateChatDto;
+  async updateChatById(conversationId: string, updateChatDto: UpdateChatDto): Promise<any> {
 
     const updatedChat = await this.db
       .update(chats)
-      .set({ chatBlob })
-      .where(sql`${chats.conversationId} = ${updateChatDto.conversationId}`)
+      .set({ chatBlob: updateChatDto })
+      .where(sql`${chats.conversationId} = ${conversationId}`)
       .returning();
 
     if (updatedChat.length === 0) {

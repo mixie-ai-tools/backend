@@ -1,10 +1,11 @@
-import { Controller, Get, Logger, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Logger, Post, Body, Param, Put } from '@nestjs/common';
 import { LlmService } from '@/api/src/llm/llm.service';
 import { LlmQueryDto } from '@app/common/dtos';
 import { LmStudioEmbeddingsService } from '@/api/src/llm/lmstudio.service';
 import { ShopifyService } from './shopify.service';
 import { ChatsService } from './chats.service';
 import { CreateChatDto } from './dto/chat-create.dto';
+import { UpdateChatDto } from './dto/chat-update.dto';
 
 @Controller('llm')
 export class LlmController {
@@ -24,6 +25,12 @@ export class LlmController {
   @Get('/chats/:conversationId')
   async getChatById(@Param('conversationId') conversationId: string) {
     return await this.chatService.getAllChatById(conversationId)
+  }
+
+
+  @Put('/chats/:conversationId')
+  async updateChatById(@Param('conversationId') conversationId: string, @Body() updateChatDto: UpdateChatDto) {
+    return await this.chatService.updateChatById(conversationId, updateChatDto)
   }
 
 
