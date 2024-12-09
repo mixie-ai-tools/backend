@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Post, Body } from '@nestjs/common';
+import { Controller, Get, Logger, Post, Body, Param } from '@nestjs/common';
 import { LlmService } from '@/api/src/llm/llm.service';
 import { LlmQueryDto } from '@app/common/dtos';
 import { LmStudioEmbeddingsService } from '@/api/src/llm/lmstudio.service';
@@ -18,6 +18,12 @@ export class LlmController {
   @Get('/chats')
   async getChats() {
     return await this.chatService.getAllChats();
+  }
+
+
+  @Get('/chats/:conversationId')
+  async getChatById(@Param('conversationId') conversationId: string) {
+    return await this.chatService.getAllChatById(conversationId)
   }
 
 

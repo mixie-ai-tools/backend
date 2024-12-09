@@ -8,12 +8,20 @@ import { sql } from 'drizzle-orm';
 
 @Injectable()
 export class ChatsService {
-  constructor(@Inject('POSTGRES_DB') private readonly db: PostgresJsDatabase) {}
+  constructor(@Inject('POSTGRES_DB') private readonly db: PostgresJsDatabase) { }
 
   // Fetch all chats
   async getAllChats() {
     const allChats = await this.db.select().from(chats).execute();
     return allChats;
+  }
+
+
+  async getAllChatById(conversationId: string) {
+    const chat = await this.db.select().from(chats)
+    .where(sql`${chats.conversationId} = ${conversationId}`)
+    .execute();
+    return chat;
   }
 
   // Create a new chat
