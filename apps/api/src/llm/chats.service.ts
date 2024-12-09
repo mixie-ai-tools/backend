@@ -24,14 +24,11 @@ export class ChatsService {
     return chat;
   }
 
-  // Create a new chat
   async createChat(chatBlob: CreateChatDto): Promise<any> {
-    const now = new Date();
-
     const insertedChat = await this.db
       .insert(chats)
       .values({
-        conversationId: uuid(), // Generates a random UUID for the conversation ID
+        conversationId: uuid(),
         chatBlob: chatBlob.chatBlob,
       })
       .returning();
@@ -39,9 +36,7 @@ export class ChatsService {
     return insertedChat;
   }
 
-  // Update an existing chat by conversationId
   async updateChatById(conversationId: string, updateChatDto: UpdateChatDto): Promise<any> {
-
     const updatedChat = await this.db
       .update(chats)
       .set({ chatBlob: updateChatDto })

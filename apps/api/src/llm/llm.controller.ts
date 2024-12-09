@@ -18,30 +18,52 @@ export class LlmController {
 
   @Get('/chats')
   async getChats() {
-    return await this.chatService.getAllChats();
+    try {
+      return await this.chatService.getAllChats();
+    } catch (error) {
+      Logger.log(error);
+    }
   }
 
 
   @Get('/chats/:conversationId')
   async getChatById(@Param('conversationId') conversationId: string) {
-    return await this.chatService.getAllChatById(conversationId)
+    try {
+
+      return await this.chatService.getAllChatById(conversationId);
+    } catch (error) {
+      Logger.log(error);
+    }
   }
 
 
   @Put('/chats/:conversationId')
   async updateChatById(@Param('conversationId') conversationId: string, @Body() updateChatDto: UpdateChatDto) {
-    return await this.chatService.updateChatById(conversationId, updateChatDto)
+    try {
+      return await this.chatService.updateChatById(conversationId, updateChatDto);
+    } catch (error) {
+      Logger.log(error);
+    }
   }
 
 
   @Post('/chats')
-  async createChat(@Body() chatData: CreateChatDto){
-    return await this.chatService.createChat(chatData)
+  async createChat(@Body() chatData: CreateChatDto) {
+    try {
+      return await this.chatService.createChat(chatData)
+    } catch (error) {
+      Logger.log(error);
+    }
+
   }
 
   @Get('/search')
   async search() {
-    return await this.lmStudioService.similaritySearch('What is the name of the stuffed panda?', 5);
+    try {
+      return await this.lmStudioService.similaritySearchTest('What is the name of the stuffed panda?', 5);
+    } catch (error) {
+
+    }
   }
 
   @Get('process')
@@ -50,8 +72,8 @@ export class LlmController {
       const products = await this.shopifyService.fetchProducts();
       const productsData = products.data.products.edges;
       return await this.lmStudioService.addShopifyProductsToVectorStore(productsData);
-    } catch (e) {
-      Logger.log(e)
+    } catch (error) {
+      Logger.log(error);
     }
 
   }

@@ -18,7 +18,6 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
   private readonly embeddingModelName = 'embed-model';
   private readonly llmModelName = 'llm-model';
 
-
   constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore) {}
 
   async onModuleInit(): Promise<void> {
@@ -42,8 +41,6 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
     }
   }
 
-
-
   async embedText(text: string): Promise<number[]> {
     if (!this.embeddingModel) {
       throw new Error('Embedding model is not initialized.');
@@ -63,7 +60,7 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
     }
   }
 
-  async similaritySearch(query: string, topK: number, filter?: Record<string, any>) {
+  async similaritySearchTest(query: string, topK: number, filter?: Record<string, any>) {
     try {
       const docs = await this.vectorStore.similaritySearch(query, topK, filter);
       const context = docs.map((doc) => doc.pageContent).join('\n');
@@ -89,6 +86,34 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
 `;
 
       const chatHistory = ChatHistory.createEmpty();
+
+      chatHistory.append('system', systemPrompt);
+      chatHistory.append('user', prompt);
+
+ 
+      const resp = await this.llmModel.respond(chatHistory);
+      return resp;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Response generation failed: ${error.message}`,
+      );
+    }
+  }
+
+  async similaritySearch(query: string, topK: number, filter?: Record<string, any>) {
+    try {
+      const docs = await this.vectorStore.similaritySearch(query, topK, filter);
+      const context = docs.map((doc) => doc.pageContent).join('\n');
+     
+      const prompt = `
+        Question: ${query}
+        Products and Context: ${context}
+      `;
+
+      const systemPrompt = ``;
+
+      const chatHistory = ChatHistory.createEmpty();
+      
 
       chatHistory.append('system', systemPrompt);
       chatHistory.append('user', prompt);
