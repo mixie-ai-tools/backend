@@ -40,7 +40,13 @@ export class LlmController {
   @Put('/chats/:conversationId')
   async updateChatById(@Param('conversationId') conversationId: string, @Body() updateChatDto: UpdateChatDto) {
     try {
-      return await this.chatService.updateChatById(conversationId, updateChatDto);
+      const assistant = await this.lmStudioService.similaritySearch(updateChatDto, 5);
+      updateChatDto.chatBlob.push({
+        assistant: assistant.content
+      });
+
+     return  await this.chatService.updateChatById(conversationId, updateChatDto);
+
     } catch (error) {
       Logger.log(error);
     }
@@ -57,14 +63,6 @@ export class LlmController {
 
   }
 
-  @Get('/search')
-  async search() {
-    try {
-      return await this.lmStudioService.similaritySearchTest('What is the name of the stuffed panda?', 5);
-    } catch (error) {
-
-    }
-  }
 
   @Get('process')
   async processDocs() {

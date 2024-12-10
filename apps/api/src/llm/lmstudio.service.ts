@@ -3,40 +3,43 @@ import {
   Injectable,
   OnModuleInit,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { LMStudioClient } from '@lmstudio/sdk';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { Document } from 'langchain/document';
 import { v7 as uuidv7 } from 'uuid';
 import { ChatHistory, ChatMessage } from '@lmstudio/sdk';
+import { UpdateChatDto } from './dto/chat-update.dto';
 
 @Injectable()
-export class LmStudioEmbeddingsService implements OnModuleInit{
+export class LmStudioEmbeddingsService implements OnModuleInit {
   private lmStudioClient: LMStudioClient;
   private embeddingModel: any; // Replace `any` with the exact type from the SDK, if available.
-  private llmModel : any;
+  private llmModel: any;
   private readonly embeddingModelName = 'embed-model';
   private readonly llmModelName = 'llm-model';
 
-  constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore) {}
+  constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore) { }
 
   async onModuleInit(): Promise<void> {
     this.lmStudioClient = new LMStudioClient();
 
-    try {     
+    try {
       this.embeddingModel = await this.lmStudioClient.embedding.get({
         identifier: this.embeddingModelName
       });
     } catch (e) {
       console.log('NO EMBEDDING MODEL AVAILABLE')
-      this.embeddingModel = await this.lmStudioClient.embedding.load('text-embedding-nomic-embed-text-v1.5',{
-        identifier: this.embeddingModelName
+      this.embeddingModel = await this.lmStudioClient.embedding.load('text-embedding-nomic-embed-text-v1.5', {
+        identifier: this.embeddingModelName,
+        
       });
     }
 
     try {
       this.llmModel = await this.lmStudioClient.llm.get(this.llmModelName);
-    }catch(e){
+    } catch (e) {
       console.log('NO LLM AVAILABLE')
     }
   }
@@ -60,65 +63,42 @@ export class LmStudioEmbeddingsService implements OnModuleInit{
     }
   }
 
-  async similaritySearchTest(query: string, topK: number, filter?: Record<string, any>) {
+
+  async similaritySearch(updateChatDto: UpdateChatDto, topK: number, filter?: Record<string, any>) {
     try {
+
+      // find the first user prompt 
+      const { chatBlob } = updateChatDto;
+      const query = chatBlob[chatBlob.length - 1].user;
+
+      if (!query) return;
+
       const docs = await this.vectorStore.similaritySearch(query, topK, filter);
       const context = docs.map((doc) => doc.pageContent).join('\n');
-     
+
       const prompt = `
         Question: ${query}
         Products and Context: ${context}
       `;
 
-      const systemPrompt = `You are a friendly and helpful assistant designed to assist customers in finding products in our Shopify store. Your main goal is to provide accurate and relevant information about our products. Here are some guidelines for your interactions:
-
-1. **Greet the User**: Always start by saying "Hello! How can I help you find something today?"
-2. **Understand User Needs**: Ask clarifying questions if needed to understand what the user is looking for. For example, "Are you looking for a specific type of product, such as clothing or electronics?"
-3. **Provide Product Information**:
-   - Use clear and concise language.
-   - Mention key features, prices, and availability.
-   - If there are multiple options, suggest a few choices.
-4. **Offer Help with Additional Queries**: If the user has more questions after your initial response, continue to assist them until they find what they need or decide to stop.
-5. **Be Polite and Helpful**: Always be friendly and offer assistance even if you can't find an exact match for their request.
-6. **Encourage Further Interaction**: Suggest that users visit the store website for more details or to make a purchase. For example, "You can check out our full collection on please accept this cookie."
-7. **Follow Up**: If the user seems unsure or if they need more help, follow up with additional questions or information.
-
-`;
 
       const chatHistory = ChatHistory.createEmpty();
 
-      chatHistory.append('system', systemPrompt);
+      for (let i = 0; i < chatBlob.length - 1; i++) {
+
+        if (chatBlob[i].system) {
+          chatHistory.append('system', chatBlob[i].system);
+        }
+        if (chatBlob[i].user) {
+          chatHistory.append('user', chatBlob[i].user);
+        }
+        if (chatBlob[i].assistant) {
+          chatHistory.append('assistant', chatBlob[i].assistant);
+        }
+      }
+
+
       chatHistory.append('user', prompt);
-
- 
-      const resp = await this.llmModel.respond(chatHistory);
-      return resp;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Response generation failed: ${error.message}`,
-      );
-    }
-  }
-
-  async similaritySearch(query: string, topK: number, filter?: Record<string, any>) {
-    try {
-      const docs = await this.vectorStore.similaritySearch(query, topK, filter);
-      const context = docs.map((doc) => doc.pageContent).join('\n');
-     
-      const prompt = `
-        Question: ${query}
-        Products and Context: ${context}
-      `;
-
-      const systemPrompt = ``;
-
-      const chatHistory = ChatHistory.createEmpty();
-      
-
-      chatHistory.append('system', systemPrompt);
-      chatHistory.append('user', prompt);
-
- 
       const resp = await this.llmModel.respond(chatHistory);
       return resp;
     } catch (error) {
