@@ -1,26 +1,47 @@
 import {
   Inject,
   Injectable,
+  OnModuleInit,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
+import { LMStudioClient } from '@lmstudio/sdk';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { Document } from 'langchain/document';
 import { v7 as uuidv7 } from 'uuid';
-import { ChatHistory } from '@lmstudio/sdk';
+import { ChatHistory, ChatMessage } from '@lmstudio/sdk';
 import { UpdateChatDto } from './dto/chat-update.dto';
-import { ModelProvider } from './model.provider';
 
 @Injectable()
-export class LmStudioEmbeddingsService {
+export class LmStudioEmbeddingsService implements OnModuleInit {
+  private lmStudioClient: LMStudioClient;
+  private embeddingModel: any; // Replace `any` with the exact type from the SDK, if available.
+  private llmModel: any;
+  private readonly embeddingModelName = 'embed-model';
+  private readonly llmModelName = 'llm-model';
 
-  private readonly embeddingModel: any; 
-  private readonly llmModel: any;
+  constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore) { }
 
+  async onModuleInit(): Promise<void> {
+    this.lmStudioClient = new LMStudioClient();
 
-  constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore,
-    @Inject('MODEL_PROVIDER') modelProvider: ModelProvider) {
-    this.embeddingModel = modelProvider.getEmbeddingModel();
-    this.llmModel = modelProvider.getLLMModel();
+    try {
+      this.embeddingModel = await this.lmStudioClient.embedding.get({
+        identifier: this.embeddingModelName
+      });
+    } catch (e) {
+      console.log('NO EMBEDDING MODEL AVAILABLE')
+      this.embeddingModel = await this.lmStudioClient.embedding.load('text-embedding-nomic-embed-text-v1.5', {
+        identifier: this.embeddingModelName,
+        
+      });
+    }
+
+    try {
+      this.llmModel = await this.lmStudioClient.llm.get(this.llmModelName);
+    } catch (e) {
+      console.log('NO LLM AVAILABLE')
+    }
   }
 
   async embedText(text: string): Promise<number[]> {
@@ -45,6 +66,8 @@ export class LmStudioEmbeddingsService {
 
   async similaritySearch(updateChatDto: UpdateChatDto, topK: number, filter?: Record<string, any>) {
     try {
+
+      // find the first user prompt 
       const { chatBlob } = updateChatDto;
       const query = chatBlob[chatBlob.length - 1].user;
 
@@ -74,6 +97,7 @@ export class LmStudioEmbeddingsService {
         }
       }
 
+
       chatHistory.append('user', prompt);
       const resp = await this.llmModel.respond(chatHistory);
       return resp;
@@ -86,6 +110,7 @@ export class LmStudioEmbeddingsService {
 
   async addShopifyProductsToVectorStore(productsData: any[]): Promise<void> {
     try {
+      // Create documents from the products data
       const docs: Document[] = productsData.map((product) => {
         return new Document({
           pageContent: product.node.description,
@@ -93,8 +118,10 @@ export class LmStudioEmbeddingsService {
         });
       });
 
+      // Generate unique IDs for the documents
       const ids = docs.map(() => uuidv7());
 
+      // Add documents to the PGVectorStore
       await this.vectorStore.addDocuments(docs, { ids });
 
     } catch (error) {
