@@ -76,13 +76,4 @@ export class LlmController {
 
   }
 
-  @Get('/test')
-  async test() {
-    try {
-      Logger.log("We are in here");
-      return 'hello world';
-    }catch(error){
-      Logger.log(error);
-    }
-  }
 }
