@@ -20,16 +20,32 @@ export class TutorialService implements OnModuleInit {
   onModuleInit() {}
 
   async test() {
-    const template = new PromptTemplate({
+    const codeTemplate = new PromptTemplate({
       template: `write a very short {language} function with {task}`,
       inputVariables: ['language', 'task'],
     });
 
-    const chain = template.pipe(this.llm);
-    const response = await chain.invoke({
+    const codeChain = codeTemplate.pipe(this.llm);
+    // const testChain = testTemplate.pipe(this.llm);
+
+    const codeResponse = await codeChain.invoke({
       language: 'javascript',
       task: 'add two numbers',
     });
-    console.log(response);
+
+    const testTemplate = new PromptTemplate({
+      template: 'Write a unit test in {language} for this code:\n {code}',
+      inputVariables: ['language', 'code'],
+    });
+
+
+    const testResult = await testTemplate.invoke({
+      language: 'javascript',
+      code: codeResponse,
+    });
+
+    console.log(codeResponse);
+
+    console.log(testResult);
   }
 }

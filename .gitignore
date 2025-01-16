@@ -1,4 +1,5 @@
 # compiled output
+.ignore
 /dist
 /node_modules
 /build

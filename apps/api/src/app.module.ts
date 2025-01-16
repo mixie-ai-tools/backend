@@ -7,10 +7,17 @@ import { ShopController } from './shop/shop.controller';
 import { RezController } from './rez/rez.controller';
 import { TutorialController } from './tutorial/tutorial.controller';
 import { TutorialService } from './tutorial/tutorial.service';
+import { CalendarController } from './calendar/calendar.controller';
+import { CalendarService } from './calendar/calendar.service';
 
 @Module({
   imports: [LlmModule, SseModule, ShopifyModule],
-  providers: [TutorialService],
-  controllers: [ShopController, RezController, TutorialController],
+  providers: [TutorialService, CalendarService],
+  controllers: [
+    ShopController,
+    RezController,
+    TutorialController,
+    CalendarController,
+  ],
 })
 export class AppModule {}

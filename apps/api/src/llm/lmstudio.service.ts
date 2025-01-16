@@ -12,13 +12,13 @@ import { ModelProvider } from './model.provider';
 
 @Injectable()
 export class LmStudioEmbeddingsService {
-
-  private readonly embeddingModel: any; 
+  private readonly embeddingModel: any;
   private readonly llmModel: any;
 
-
-  constructor(@Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore,
-    @Inject('MODEL_PROVIDER') modelProvider: ModelProvider) {
+  constructor(
+    @Inject('POSTGRES_VECTOR_DB') private readonly vectorStore: PGVectorStore,
+    @Inject('MODEL_PROVIDER') modelProvider: ModelProvider,
+  ) {
     this.embeddingModel = modelProvider.getEmbeddingModel();
     this.llmModel = modelProvider.getLLMModel();
   }
@@ -42,8 +42,11 @@ export class LmStudioEmbeddingsService {
     }
   }
 
-
-  async similaritySearch(updateChatDto: UpdateChatDto, topK: number, filter?: Record<string, any>) {
+  async similaritySearch(
+    updateChatDto: UpdateChatDto,
+    topK: number,
+    filter?: Record<string, any>,
+  ) {
     try {
       const { chatBlob } = updateChatDto;
       const query = chatBlob[chatBlob.length - 1].user;
@@ -58,11 +61,9 @@ export class LmStudioEmbeddingsService {
         Products and Context: ${context}
       `;
 
-
       const chatHistory = ChatHistory.createEmpty();
 
       for (let i = 0; i < chatBlob.length - 1; i++) {
-
         if (chatBlob[i].system) {
           chatHistory.append('system', chatBlob[i].system);
         }
@@ -96,7 +97,6 @@ export class LmStudioEmbeddingsService {
       const ids = docs.map(() => uuidv7());
 
       await this.vectorStore.addDocuments(docs, { ids });
-
     } catch (error) {
       throw new InternalServerErrorException(
         `Failed to add Shopify products to vector store: ${error.message}`,

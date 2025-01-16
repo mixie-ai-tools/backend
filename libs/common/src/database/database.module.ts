@@ -60,7 +60,10 @@ import { EmbeddingModel } from './classes/embedding-model';
         await embeddingService.init();
 
         // Initialize PGVectorStore
-        const vectorStore = await PGVectorStore.initialize(embeddingService, config);
+        const vectorStore = await PGVectorStore.initialize(
+          embeddingService,
+          config,
+        );
 
         return vectorStore;
       },

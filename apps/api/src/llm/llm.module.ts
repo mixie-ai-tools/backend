@@ -34,13 +34,17 @@ import { LMStudioClient } from '@lmstudio/sdk';
       useFactory: async (
         lmStudioClient: LMStudioClient,
       ): Promise<ModelProvider> => {
-        const provider = new ModelProvider(lmStudioClient, 'embed-model', 'llm-model');
+        const provider = new ModelProvider(
+          lmStudioClient,
+          'embed-model',
+          'llm-model',
+        );
 
         await provider.onModuleInit();
 
         return provider;
       },
-      inject: [LMStudioClient, ],
+      inject: [LMStudioClient],
     },
     LlmService,
     LmStudioEmbeddingsService,
@@ -48,4 +52,4 @@ import { LMStudioClient } from '@lmstudio/sdk';
     ChatsService,
   ],
 })
-export class LlmModule { }
+export class LlmModule {}
