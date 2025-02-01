@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1732481591790,
-      "tag": "0000_useful_the_fallen",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1733659811933,
-      "tag": "0001_past_captain_cross",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1733659925526,
-      "tag": "0002_serious_polaris",
+      "when": 1738387872487,
+      "tag": "0000_white_fat_cobra",
       "breakpoints": true
     }
   ]

@@ -4,6 +4,6 @@ export default defineConfig({
   schema: './schema/index.ts',
   out: './migrations',
   dbCredentials: {
-    url: 'postgres://postgres:postgres@localhost:5432/mixietape',
+    url: 'postgres://postgres:postgres@localhost:5432/storyboard',
   },
 });

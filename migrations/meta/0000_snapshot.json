@@ -1,11 +1,11 @@
 {
-  "id": "e49c4ec5-0da6-4747-92b8-4c6b34b97185",
+  "id": "bf473dae-8fcf-49bd-848d-1427f94ff33b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.vectors": {
-      "name": "vectors",
+    "public.image_variant": {
+      "name": "image_variant",
       "schema": "",
       "columns": {
         "id": {
@@ -14,23 +14,224 @@
           "primaryKey": true,
           "notNull": true
         },
-        "vector": {
-          "name": "vector",
-          "type": "vector(1536)",
+        "storyboard_id": {
+          "name": "storyboard_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "content": {
-          "name": "content",
+        "aspectRatio": {
+          "name": "aspectRatio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "url": {
+          "name": "url",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "image_variant_storyboard_id_original_image_id_fk": {
+          "name": "image_variant_storyboard_id_original_image_id_fk",
+          "tableFrom": "image_variant",
+          "tableTo": "original_image",
+          "columnsFrom": [
+            "storyboard_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.original_image": {
+      "name": "original_image",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "storyboard_id": {
+          "name": "storyboard_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "original_image_storyboard_id_storyboard_steps_id_fk": {
+          "name": "original_image_storyboard_id_storyboard_steps_id_fk",
+          "tableFrom": "original_image",
+          "tableTo": "storyboard_steps",
+          "columnsFrom": [
+            "storyboard_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.storyboard_steps": {
+      "name": "storyboard_steps",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "storyboard_id": {
+          "name": "storyboard_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "storyboard_steps_storyboard_id_storyboards_id_fk": {
+          "name": "storyboard_steps_storyboard_id_storyboards_id_fk",
+          "tableFrom": "storyboard_steps",
+          "tableTo": "storyboards",
+          "columnsFrom": [
+            "storyboard_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.storyboards": {
+      "name": "storyboards",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "step_order": {
+          "name": "step_order",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
